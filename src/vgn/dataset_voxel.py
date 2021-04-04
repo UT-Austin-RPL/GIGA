@@ -7,7 +7,6 @@ from vgn.io import *
 from vgn.perception import *
 from vgn.utils.transform import Rotation, Transform
 from vgn.utils.implicit import get_scene_from_mesh_pose_list
-from vgn.dataset_pc_occ import sample_point_cloud
 
 class DatasetVoxel(torch.utils.data.Dataset):
     def __init__(self, root, raw_root, num_point=2048, augment=False):
@@ -134,3 +133,11 @@ def apply_transform(voxel_grid, orientation, position):
     orientation = T.rotation * orientation
 
     return voxel_grid, orientation, position
+
+def sample_point_cloud(pc, num_point, return_idx=False):
+    num_point_all = pc.shape[0]
+    idxs = np.random.choice(np.arange(num_point_all), size=(num_point,), replace=num_point > num_point_all)
+    if return_idx:
+        return pc[idxs], idxs
+    else:
+        return pc[idxs]

@@ -7,7 +7,7 @@ GIGA (Grasp detection via Implicit Geometry and Affordance) is a network that jo
 
 1. Create a conda environment.
 
-2. Install packages list in [requirements.txt](requirements.txt). Mention, `torch-scatter` needs to be installed following [here](https://github.com/rusty1s/pytorch_scatter), based on `pytorch` version and `cuda` version.
+2. Install packages list in [requirements.txt](requirements.txt). Then install `torch-scatter` following [here](https://github.com/rusty1s/pytorch_scatter), based on `pytorch` version and `cuda` version.
 
 3. Go to the root directory and install the project locally using `pip`
 
@@ -86,6 +86,6 @@ Run `python scripts/sim_grasp_multiple.py -h` to print a complete list of option
 
 ## Related Repositories
 
-1. Our code is based on [VGN](https://github.com/ethz-asl/vgn) 
+1. Our code is largely based on [VGN](https://github.com/ethz-asl/vgn) 
 
 2. We use [ConvONets](https://github.com/autonomousvision/convolutional_occupancy_networks) as our backbone.

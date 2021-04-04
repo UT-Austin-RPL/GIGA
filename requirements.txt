@@ -3,13 +3,13 @@ scipy
 pandas
 matplotlib
 open3d
+catkin_pkg
 pybullet==2.7.9
-torch
+torch==1.7.0
 pytorch-ignite
 tensorboard
 tqdm
 trimesh
-torch-scatter
 urdfpy
 cython
 scikit-image
