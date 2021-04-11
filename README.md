@@ -1,5 +1,11 @@
 # Synergies Between Affordance and Geometry: 6-DoF Grasp Detection via Implicit Representations
 
+[Zhenyu Jiang](http://zhenyujiang.me), [Yifeng Zhu](https://zhuyifengzju.github.io/), [Maxwell Svetlik](https://maxsvetlik.github.io/), [Kuan Fang](https://ai.stanford.edu/~kuanfang/), [Yuke Zhu](https://www.cs.utexas.edu/~yukez/)
+
+[Project](https://sites.google.com/view/rpl-giga2021) | [arxiv](http://arxiv.org/abs/2104.01542)
+
+## Introduction
+
 GIGA (Grasp detection via Implicit Geometry and Affordance) is a network that jointly detects 6 DOF grasp poses and reconstruct the 3D scene. GIGA takes advantage of deep implicit functions, a continuous and memory-efficient representation, to enable differentiable training of both tasks. GIGA takes as input a Truncated Signed Distance Function (TSDF) representation of the scene, and predicts local implicit functions for grasp affordance and 3D occupancy. By querying the affordance implict functions with grasp center candidates, we can get grasp quality, grasp orientation and gripper width at these centers. GIGA is trained on a synthetic grasping dataset generated with physics simulation.
 
 
