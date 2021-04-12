@@ -19,8 +19,7 @@ def main(args):
                                     force_detection=args.force,
                                     out_th=0.1,
                                     select_top=False,
-                                    visualize=args.vis,
-                                    resolution=args.res)
+                                    visualize=args.vis)
     elif args.type == 'vgn':
         grasp_planner = VGN(args.model,
                             args.type,
@@ -50,7 +49,6 @@ def main(args):
             result_path=None,
             add_noise=args.add_noise,
             sideview=args.sideview,
-            resolution=args.res,
             silence=args.silence,
             visualize=args.vis)
         gsr.append(success_rate)
@@ -67,6 +65,9 @@ def main(args):
             'val': dr
         }
     }
+    print('Average results:')
+    print(f'Grasp sucess rate: {np.mean(gsr):.2f} ± {np.std(gsr):.2f} %')
+    print(f'Declutter rate: {np.mean(dr):.2f} ± {np.std(dr):.2f} %')
     with open(args.result_path, 'w') as f:
         json.dump(results, f, indent=2)
 
@@ -111,8 +112,6 @@ if __name__ == "__main__":
     parser.add_argument("--sideview",
                         action="store_true",
                         help="Whether to look from one side")
-    parser.add_argument("--res", type=int, default=40)
-    parser.add_argument("--out-th", type=float, default=0.5)
     parser.add_argument("--silence",
                         action="store_true",
                         help="Whether to disable tqdm bar")

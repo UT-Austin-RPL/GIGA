@@ -21,9 +21,9 @@ GIGA (Grasp detection via Implicit Geometry and Affordance) is a network that jo
 pip install -e .
 ```
 
-4. Build ConvONets dependents by running `python scripts/convonet_setup.py build_ext --inplace`
+4. Build ConvONets dependents by running `python scripts/convonet_setup.py build_ext --inplace`.
 
-5. Download the [data](https://drive.google.com/file/d/1MnWwxkYo9WnLFNseEVSWRT1q-XElYlxJ/view?usp=sharing), then unzip and place the data folder under the repo's root.
+5. Download the [data](https://drive.google.com/file/d/13vlsR9797qW097bYXhJ8lN8b7Eb_UdgD/view?usp=sharing), then unzip and place the data folder under the repo's root. Pretrained models of GIGA, GIGA-Aff and VGN are in `data/models`.
 
 ## Self-supervised Data Generation
 
@@ -83,7 +83,7 @@ python scripts/train_giga.py --dataset /path/to/new/data --dataset_raw /path/to/
 Run:
 
 ```bash
-python scripts/sim_grasp_multiple.py --num-view 1 --object-set packed/test --scene packed --num-rounds 100 --sideview --add-noise dex --force --best --model /path/to/model --type (vgn | giga | giga_aff) --result-path /path/to/result
+python scripts/sim_grasp_multiple.py --num-view 1 --object-set (packed/test | pile/test) --scene （packed ｜ pile) --num-rounds 100 --sideview --add-noise dex --force --best --model /path/to/model --type (vgn | giga | giga_aff) --result-path /path/to/result
 ```
 
 This commands will run experiment with each seed specified in the arguments.

@@ -110,8 +110,8 @@ def run(
         left_objs += sim.num_objects
     success_rate = 100.0 * success / cnt
     declutter_rate = 100.0 * success / total_objs
-    print('Grasp success rate and Clear percent: %.2f%%, %.2f%%' % (success_rate, declutter_rate))
-    print('Consecutive failures and no detections: %d, %d' % (cons_fail, no_grasp))
+    print('Grasp success rate: %.2f %%, Declutter rate: %.2f %%' % (success_rate, declutter_rate))
+    #print('Consecutive failures and no detections: %d, %d' % (cons_fail, no_grasp))
     if result_path is not None:
         with open(result_path, 'w') as f:
             f.write('%.2f%%, %.2f%%; %d, %d\n' % (success_rate, declutter_rate, cons_fail, no_grasp))
