@@ -23,7 +23,7 @@ pip install -e .
 
 4. Build ConvONets dependents by running `python scripts/convonet_setup.py build_ext --inplace`.
 
-5. Download the [data](https://drive.google.com/file/d/13vlsR9797qW097bYXhJ8lN8b7Eb_UdgD/view?usp=sharing), then unzip and place the data folder under the repo's root. Pretrained models of GIGA, GIGA-Aff and VGN are in `data/models`.
+5. Download the [data](https://utexas.box.com/s/h3ferwjhuzy6ja8bzcm3nu9xq1wkn94s), then unzip and place the data folder under the repo's root. Pretrained models of GIGA, GIGA-Aff and VGN are in `data/models`.
 
 ## Self-supervised Data Generation
 
@@ -89,6 +89,21 @@ python scripts/sim_grasp_multiple.py --num-view 1 --object-set (packed/test | pi
 This commands will run experiment with each seed specified in the arguments.
 
 Run `python scripts/sim_grasp_multiple.py -h` to print a complete list of optional arguments.
+
+## Pre-trained models and pre-generated data
+
+### Pre-trained models
+
+Pretrained models are also in the [data.zip](https://utexas.box.com/s/h3ferwjhuzy6ja8bzcm3nu9xq1wkn94s). They are in `data/models`.
+
+### Pre-generated data
+
+As mentioned in the [issue](https://github.com/UT-Austin-RPL/GIGA/issues/3), data generation is very costly. So we upload the generated data. Because the occupancy data takes too much space (over 100G), we do not upload the occupancy data, you can generate them following the instruction in thie [section](#save-occupancy-data). This generation won't take too long time.
+
+| Scenario | Raw data | Processed data |
+| ----------- | ----------- |
+| Packed | [link](https://utexas.box.com/s/wlvs1ebapfnlxcfcz1ta22gasr7bgz3q) | [link](https://utexas.box.com/s/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2) |
+| Pile | [link](https://utexas.box.com/s/xukmhdj4gq22ao7lmrm33m3lwffaf7jz) | [link](https://utexas.box.com/s/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn) |
 
 ## Related Repositories
 
