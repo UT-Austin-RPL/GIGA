@@ -101,7 +101,7 @@ Pretrained models are also in the [data.zip](https://utexas.box.com/s/h3ferwjhuz
 As mentioned in the [issue](https://github.com/UT-Austin-RPL/GIGA/issues/3), data generation is very costly. So we upload the generated data. Because the occupancy data takes too much space (over 100G), we do not upload the occupancy data, you can generate them following the instruction in thie [section](#save-occupancy-data). This generation won't take too long time.
 
 | Scenario | Raw data | Processed data |
-| ----------- | ----------- |
+| ----------- | ----------- | ----------- |
 | Packed | [link](https://utexas.box.com/s/wlvs1ebapfnlxcfcz1ta22gasr7bgz3q) | [link](https://utexas.box.com/s/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2) |
 | Pile | [link](https://utexas.box.com/s/xukmhdj4gq22ao7lmrm33m3lwffaf7jz) | [link](https://utexas.box.com/s/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn) |
 
