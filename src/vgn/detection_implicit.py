@@ -52,7 +52,6 @@ class VGNImplicit(object):
         rot_vol = rot_vol.reshape((self.resolution, self.resolution, self.resolution, 4))
         width_vol = width_vol.reshape((self.resolution, self.resolution, self.resolution))
 
-
         qual_vol, rot_vol, width_vol = process(tsdf_process, qual_vol, rot_vol, width_vol, out_th=self.out_th)
         qual_vol = bound(qual_vol, voxel_size)
         if self.visualize:

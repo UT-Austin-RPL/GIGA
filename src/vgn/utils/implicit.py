@@ -39,7 +39,7 @@ def get_mesh_pose_list_from_world(world, object_set, exclude_plane=True):
         if name == 'plane' and exclude_plane:
             continue
         body = world.bodies[uid]
-        pose = body.get_pose()
+        pose = body.get_pose().as_matrix()
         scale = body.scale
         visuals = world.p.getVisualShapeData(uid)
         assert len(visuals) == 1
@@ -65,7 +65,7 @@ def get_scene_from_mesh_pose_list(mesh_pose_list, scene_as_mesh=True, return_lis
             mesh = trimesh.load(mesh_path)
 
         mesh.apply_scale(scale)
-        mesh.apply_transform(pose.as_matrix())
+        mesh.apply_transform(pose)
         scene.add_geometry(mesh)
         mesh_list.append(mesh)
     if scene_as_mesh:

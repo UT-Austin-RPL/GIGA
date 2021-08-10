@@ -35,7 +35,8 @@ def log_result(result):
 
 def main(args):
     mesh_list_files = glob.glob(os.path.join(args.raw, 'mesh_pose_list', '*.npz'))
-    mesh_list_files = mesh_list_files
+    
+
     global g_completed_jobs
     global g_num_total_jobs
     global g_starting_time
@@ -44,12 +45,17 @@ def main(args):
     g_completed_jobs = []
 
     g_starting_time = time.time()
-    pool = mp.Pool(processes=args.num_proc) 
-    print('Total jobs: %d, CPU num: %d' % (g_num_total_jobs, args.num_proc))
-    for f in mesh_list_files:
-        pool.apply_async(func=save_occ, args=(f,args), callback=log_result)
-    pool.close()
-    pool.join()
+
+    if args.num_proc > 1:
+        pool = mp.Pool(processes=args.num_proc) 
+        print('Total jobs: %d, CPU num: %d' % (g_num_total_jobs, args.num_proc))
+        for f in mesh_list_files:
+            pool.apply_async(func=save_occ, args=(f,args), callback=log_result)
+        pool.close()
+        pool.join()
+    else:
+        for f in mesh_list_files:
+            save_occ(f, args)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -44,6 +44,8 @@ def run(
     run until (a) no objects remain, (b) the planner failed to find a grasp hypothesis,
     or (c) maximum number of consecutive failed grasp attempts.
     """
+    #sideview=False
+    #n = 6
     sim = ClutterRemovalSim(scene, object_set, gui=sim_gui, seed=seed, add_noise=add_noise, sideview=sideview)
     logger = Logger(logdir, description)
     cnt = 0
@@ -52,6 +54,8 @@ def run(
     total_objs = 0
     cons_fail = 0
     no_grasp = 0
+    planning_times = []
+    total_times = []
 
     for _ in tqdm.tqdm(range(num_rounds), disable=silence):
         sim.reset(num_objects)
@@ -85,6 +89,8 @@ def run(
                 logger.log_mesh(scene_mesh, visual_mesh, f'round_{round_id:03d}_trial_{trial_id:03d}')
             else:
                 grasps, scores, timings["planning"] = grasp_plan_fn(state)
+            planning_times.append(timings["planning"])
+            total_times.append(timings["planning"] + timings["integration"])
 
             if len(grasps) == 0:
                 no_grasp += 1
@@ -111,6 +117,7 @@ def run(
     success_rate = 100.0 * success / cnt
     declutter_rate = 100.0 * success / total_objs
     print('Grasp success rate: %.2f %%, Declutter rate: %.2f %%' % (success_rate, declutter_rate))
+    print(f'Average planning time: {np.mean(planning_times)}, total time: {np.mean(total_times)}')
     #print('Consecutive failures and no detections: %d, %d' % (cons_fail, no_grasp))
     if result_path is not None:
         with open(result_path, 'w') as f:

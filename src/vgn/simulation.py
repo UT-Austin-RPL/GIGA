@@ -183,7 +183,7 @@ class ClutterRemovalSim(object):
         pc = high_res_tsdf.get_cloud()
         pc = pc.crop(bounding_box)
 
-        return tsdf, pc, depth_img
+        return tsdf, pc, timing
 
     def execute_grasp(self, grasp, remove=True, allow_contact=False):
         T_world_grasp = grasp.pose
