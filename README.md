@@ -2,12 +2,15 @@
 
 [Zhenyu Jiang](http://zhenyujiang.me), [Yifeng Zhu](https://zhuyifengzju.github.io/), [Maxwell Svetlik](https://maxsvetlik.github.io/), [Kuan Fang](https://ai.stanford.edu/~kuanfang/), [Yuke Zhu](https://www.cs.utexas.edu/~yukez/)
 
-[Project](https://sites.google.com/view/rpl-giga2021) | [arxiv](http://arxiv.org/abs/2104.01542)
+RSS (Robotics: Science and Systems) 2021
+
+[Project](https://sites.google.com/view/rpl-giga2021) | [arxiv](http://arxiv.org/abs/2104.01542) 
 
 ## Introduction
 
 GIGA (Grasp detection via Implicit Geometry and Affordance) is a network that jointly detects 6 DOF grasp poses and reconstruct the 3D scene. GIGA takes advantage of deep implicit functions, a continuous and memory-efficient representation, to enable differentiable training of both tasks. GIGA takes as input a Truncated Signed Distance Function (TSDF) representation of the scene, and predicts local implicit functions for grasp affordance and 3D occupancy. By querying the affordance implict functions with grasp center candidates, we can get grasp quality, grasp orientation and gripper width at these centers. GIGA is trained on a synthetic grasping dataset generated with physics simulation.
 
+If you find our work useful in your research, please consider [citing](#citing).
 
 ## Installation
 
@@ -110,3 +113,14 @@ As mentioned in the [issue](https://github.com/UT-Austin-RPL/GIGA/issues/3), dat
 1. Our code is largely based on [VGN](https://github.com/ethz-asl/vgn) 
 
 2. We use [ConvONets](https://github.com/autonomousvision/convolutional_occupancy_networks) as our backbone.
+
+## Citing
+
+```
+@article{jiang2021synergies,
+ author = {Jiang, Zhenyu and Zhu, Yifeng and Svetlik, Maxwell and Fang, Kuan and Zhu, Yuke},
+ journal = {Robotics: science and systems},
+ title = {Synergies Between Affordance and Geometry: 6-DoF Grasp Detection via Implicit Representations},
+ year = {2021}
+}
+```
