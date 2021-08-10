@@ -105,8 +105,8 @@ As mentioned in the [issue](https://github.com/UT-Austin-RPL/GIGA/issues/3), dat
 
 | Scenario | Raw data | Processed data |
 | ----------- | ----------- | ----------- |
-| Pile | [link](https://utexas.box.com/s/wlvs1ebapfnlxcfcz1ta22gasr7bgz3q) | [link](https://utexas.box.com/s/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2) |
-| Packed | [link](https://utexas.box.com/s/xukmhdj4gq22ao7lmrm33m3lwffaf7jz) | [link](https://utexas.box.com/s/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn) |
+| Pile | [link](https://utexas.box.com/s/w1abs6xfe8d2fo0h9k4bxsdgtnvuwprj) | [link](https://utexas.box.com/s/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2) |
+| Packed | [link](https://utexas.box.com/s/roaozwxiikr27rgeauxs3gsgpwry7gk7) | [link](https://utexas.box.com/s/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn) |
 
 ## Related Repositories
 
