@@ -13,3 +13,4 @@ trimesh
 urdfpy
 cython
 scikit-image
+pykdtree
