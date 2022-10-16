@@ -5,8 +5,6 @@ from pathlib import Path
 
 from vgn.detection import VGN
 from vgn.detection_implicit import VGNImplicit
-from vgn.detection_implicit_top import VGNImplicitTop
-from vgn.detection_implicit_pc import VGNImplicitPC
 from vgn.experiments import clutter_removal_single
 from vgn.utils.misc import set_random_seed
 

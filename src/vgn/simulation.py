@@ -184,6 +184,32 @@ class ClutterRemovalSim(object):
         pc = pc.crop(bounding_box)
 
         return tsdf, pc, timing
+    
+    def acquire_obs(self, n, N=None, resolution=40):
+        if self.sideview:
+            origin = Transform(Rotation.identity(), np.r_[self.size / 2, self.size / 2, self.size / 3])
+            theta = np.pi / 3.0
+        else:
+            origin = Transform(Rotation.identity(), np.r_[self.size / 2, self.size / 2, 0])
+            theta = np.pi / 6.0
+        r = 2.0 * self.size
+
+        N = N if N else n
+        if self.sideview:
+            assert n == 1
+            phi_list = [- np.pi / 2.0]
+        else:
+            phi_list = 2.0 * np.pi * np.arange(n) / N
+        extrinsics = [camera_on_sphere(origin, r, theta, phi) for phi in phi_list]
+
+        timing = 0.0
+        obs = []
+        for extrinsic in extrinsics:
+            depth_img = self.camera.render(extrinsic)[1]
+            # add noise
+            depth_img = apply_noise(depth_img, self.add_noise)
+            obs.append((depth_img, self.camera.intrinsic, extrinsic))
+        return obs
 
     def execute_grasp(self, grasp, remove=True, allow_contact=False):
         T_world_grasp = grasp.pose

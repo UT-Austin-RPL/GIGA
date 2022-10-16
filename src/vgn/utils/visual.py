@@ -293,8 +293,8 @@ def plot_tsdf_with_grasps(tsdf,
                           s=8,
                           alpha=.8,
                           lim=[0.3, 0.3, 0.3],
-                          elev=10,
-                          azim=240,
+                          elev=40,
+                          azim=270,
                           fig=None,
                           *args,
                           **kwargs):
@@ -328,6 +328,7 @@ def plot_tsdf_with_grasps(tsdf,
                     c=color,
                     *args,
                     **kwargs)
+    ax.view_init(elev=elev, azim=azim)
     # plt.colorbar(sc, ax=ax)
     ax.set_xlim3d(0, lim[0])
     ax.set_ylim3d(0, lim[1])
