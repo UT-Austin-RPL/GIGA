@@ -93,6 +93,16 @@ This commands will run experiment with each seed specified in the arguments.
 
 Run `python scripts/sim_grasp_multiple.py -h` to print a complete list of optional arguments.
 
+## Unit grasp planner for real robot
+
+Download pretrained model first. Then run
+
+```python
+python scripts/grasp_listener.py --model data/models/giga_packed.pt --type giga
+```
+
+We use socket to pass the path to observation files. Please refer to the [test sender](scripts/test_sender.py) to see how to communicate with the planner.
+
 ## Pre-trained models and pre-generated data
 
 ### Pre-trained models

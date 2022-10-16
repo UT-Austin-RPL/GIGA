@@ -24,13 +24,17 @@ def main(args):
         trial_id += 1
         timings = {}
 
+        ### communicate with the grasp planner
         # scan the scene
         data = sim.acquire_obs(n=args.num_view, N=None, resolution=40)
+        # data: list of (depth_img, intrinsic, extrinsic)
+        # save data and send path
         obs_path = f'{args.save_obs_dir}/{trial_id}.pkl'
         with open(obs_path, 'wb') as f:
             pickle.dump(data, f)
         send_msg(['input', obs_path], port=12345)
         
+        # receive path to predicted grasp
         _, result_path = receive_msg(port=12346)
         with open(result_path, 'rb') as f:
             result = pickle.load(f)
