@@ -4,13 +4,15 @@ import open3d as o3d
 from pathlib import Path
 import pickle
 import matplotlib.pyplot as plt
+import open3d as o3d
+import cv2
 
 from vgn.detection_implicit import VGNImplicit
 from vgn.experiments.clutter_removal import State
 from vgn.perception import TSDFVolume, CameraIntrinsic
 from vgn.utils.transform import Transform
 from vgn.utils.comm import receive_msg, send_msg
-from vgn.utils.visual import plot_tsdf_with_grasps
+from vgn.utils.visual import grasp2mesh
 
 # input: depth image, camera intrinsics, camera extrinsics
 # output: grasp lists
@@ -47,25 +49,35 @@ def main(args):
 
     
 def predict_grasp(args, planner, data):
+    if len(data[0]) == 3:
+        high_res_tsdf = TSDFVolume(args.size, 120)
+    else:
+        high_res_tsdf = TSDFVolume(args.size, 120, color_type='rgb')
     tsdf = TSDFVolume(args.size, args.resolution)
-    high_res_tsdf = TSDFVolume(args.size, 120)
-    for depth, intrinsics, extrinsics in data:
+
+    for sample in data:
+        if len(sample) == 3:
+            depth, intrinsics, extrinsics = sample
+            rgb = None
+        else:
+            rgb, depth, intrinsics, extrinsics = sample
         intrinsics = CameraIntrinsic.from_dict(intrinsics)
         extrinsics = Transform.from_matrix(extrinsics)
         tsdf.integrate(depth, intrinsics, extrinsics)
-        high_res_tsdf.integrate(depth, intrinsics, extrinsics)
-    
+        high_res_tsdf.integrate(depth, intrinsics, extrinsics, rgb_img=rgb)
     bounding_box = o3d.geometry.AxisAlignedBoundingBox(args.lower, args.upper)
     pc = high_res_tsdf.get_cloud()
     pc = pc.crop(bounding_box)
     state = State(tsdf, pc)
     grasps, scores, _ = planner(state)
-    fig = plot_tsdf_with_grasps(tsdf.get_grid()[0], [grasps[0]])
-    fig.show()
-    while True:
-        if plt.waitforbuttonpress():
-            break
-    plt.close(fig)
+    # grasp_meshes = [
+    #     grasp2mesh(grasps[idx], 1).as_open3d for idx in range(len(grasps))
+    # ]
+    # geometries = [pc] + grasp_meshes
+    grasp_mesh = grasp2mesh(grasps[0], 1).as_open3d
+    grasp_mesh.paint_uniform_color([0, 0.8, 0])
+    geometries = [high_res_tsdf.get_mesh(), grasp_mesh]
+    o3d.visualization.draw_geometries(geometries)
     return grasps, scores
     
 

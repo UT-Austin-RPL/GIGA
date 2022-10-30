@@ -63,28 +63,36 @@ class CameraIntrinsic(object):
 class TSDFVolume(object):
     """Integration of multiple depth images using a TSDF."""
 
-    def __init__(self, size, resolution):
+    def __init__(self, size, resolution, color_type=None):
         self.size = size
         self.resolution = resolution
         self.voxel_size = self.size / self.resolution
         self.sdf_trunc = 4 * self.voxel_size
 
+        if color_type is None:
+            color = o3d.pipelines.integration.TSDFVolumeColorType.NoColor
+        elif color_type == "rgb":
+            color = o3d.pipelines.integration.TSDFVolumeColorType.RGB8
+        else:
+            raise ValueError("Unknown color type: {}".format(color_type))
         self._volume = o3d.pipelines.integration.UniformTSDFVolume(
             length=self.size,
             resolution=self.resolution,
             sdf_trunc=self.sdf_trunc,
-            color_type=o3d.pipelines.integration.TSDFVolumeColorType.NoColor,
+            color_type=color,
         )
 
-    def integrate(self, depth_img, intrinsic, extrinsic):
+    def integrate(self, depth_img, intrinsic, extrinsic, rgb_img=None):
         """
         Args:
             depth_img: The depth image.
             intrinsic: The intrinsic parameters of a pinhole camera model.
             extrinsics: The transform from the TSDF to camera coordinates, T_eye_task.
         """
+        if rgb_img is None:
+            rgb_img = np.empty_like(depth_img)
         rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
-            o3d.geometry.Image(np.empty_like(depth_img)),
+            o3d.geometry.Image(rgb_img),
             o3d.geometry.Image(depth_img),
             depth_scale=1.0,
             depth_trunc=2.0,
@@ -113,6 +121,9 @@ class TSDFVolume(object):
             i, j, k = voxel.grid_index
             tsdf_grid[0, i, j, k] = voxel.color[0]
         return tsdf_grid
+    
+    def get_mesh(self):
+        return self._volume.extract_triangle_mesh()
 
     def get_cloud(self):
         return self._volume.extract_point_cloud()

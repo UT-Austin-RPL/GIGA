@@ -205,10 +205,10 @@ class ClutterRemovalSim(object):
         timing = 0.0
         obs = []
         for extrinsic in extrinsics:
-            depth_img = self.camera.render(extrinsic)[1]
+            rgb, depth_img = self.camera.render(extrinsic)
             # add noise
             depth_img = apply_noise(depth_img, self.add_noise)
-            obs.append((depth_img, self.camera.intrinsic, extrinsic))
+            obs.append((rgb, depth_img, self.camera.intrinsic, extrinsic))
         return obs
 
     def execute_grasp(self, grasp, remove=True, allow_contact=False):

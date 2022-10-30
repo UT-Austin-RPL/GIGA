@@ -27,7 +27,7 @@ def main(args):
         ### communicate with the grasp planner
         # scan the scene
         data = sim.acquire_obs(n=args.num_view, N=None, resolution=40)
-        data = [(x[0], x[1].to_dict(), x[2].as_matrix()) for x in data]
+        data = [(x[0], x[1], x[2].to_dict(), x[3].as_matrix()) for x in data]
         # data: list of (depth_img, intrinsic, extrinsic)
         # save data and send path
         obs_path = f'{args.save_obs_dir}/{trial_id}.pkl'
