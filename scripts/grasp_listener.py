@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 
 from vgn.detection_implicit import VGNImplicit
 from vgn.experiments.clutter_removal import State
-from vgn.perception import TSDFVolume
+from vgn.perception import TSDFVolume, CameraIntrinsic
+from vgn.utils.transform import Transform
 from vgn.utils.comm import receive_msg, send_msg
 from vgn.utils.visual import plot_tsdf_with_grasps
 
@@ -49,6 +50,8 @@ def predict_grasp(args, planner, data):
     tsdf = TSDFVolume(args.size, args.resolution)
     high_res_tsdf = TSDFVolume(args.size, 120)
     for depth, intrinsics, extrinsics in data:
+        intrinsics = CameraIntrinsic.from_dict(intrinsics)
+        extrinsics = Transform.from_matrix(extrinsics)
         tsdf.integrate(depth, intrinsics, extrinsics)
         high_res_tsdf.integrate(depth, intrinsics, extrinsics)
     
