@@ -29,10 +29,6 @@ def move_to(robot_interface, controller_cfg, num_steps, num_additional_steps, gr
     while True:
         if len(robot_interface._state_buffer) > 0:
             if np.max(np.abs(np.array(robot_interface._state_buffer[-1].q))) < 1e-3:
-                # print(
-                #     len(robot_interface._state_buffer),
-                #     np.array(robot_interface._state_buffer[-1].q),
-                # )
                 continue
             else:
                 break
@@ -44,16 +40,7 @@ def move_to(robot_interface, controller_cfg, num_steps, num_additional_steps, gr
 
     target_pos, target_rot = grasp_pose    
     target_pos, _ = pregrasp_pose
-    # target_pos = np.array([[ 0.5075],
-    #                       [-0.0775],
-    #                       [ 0.2175]])
 
-    # pos_offset = np.array([[0.0], [0.0], [0.05]])    
-    # target_pos += pos_offset
-    # target_rot = np.array([[ 0.20820381,  0.74997007,  0.62785035],
-    #                        [ 0.3758244,  -0.65398127,  0.65655504],
-    #                        [ 0.902999,    0.09926422, -0.41801845]])
-    # target_rot = current_pose[:3, :3]
     target_quat = T.mat2quat(target_rot)
     if np.dot(target_quat, current_quat) < 0.0:
         current_quat = -current_quat
@@ -68,31 +55,35 @@ def move_to(robot_interface, controller_cfg, num_steps, num_additional_steps, gr
     # print(current_axis_angle)
     # print(target_axis_angle)
 
-    num_iters = 200
-    for _ in range(num_iters):
-        current_pose = np.array(robot_interface._state_buffer[-1].O_T_EE).reshape(4, 4).transpose()
-        current_pos = current_pose[:3, 3:]
-        current_rot = current_pose[:3, :3]
-        current_quat = T.mat2quat(current_rot)
-        if np.dot(target_quat, current_quat) < 0.0:
-            current_quat = -current_quat
-        quat_diff = T.quat_distance(target_quat, current_quat)
-        current_axis_angle = T.quat2axisangle(current_quat)
-        axis_angle_diff = T.quat2axisangle(quat_diff)
-        # print(np.round(current_pos.flatten(), 2))
-        action_pos = (target_pos - current_pos).flatten() * 10
-        action_axis_angle = axis_angle_diff.flatten() * 1
-        print(axis_angle_diff)
-        action_pos = np.clip(action_pos, -1., 1.)
-        action_axis_angle = np.clip(action_axis_angle, -0.1, 0.1) # * np.sin(_ / num_iters * np.pi)
-        # action_axis_angle = np.clip(action_axis_angle, 0., 0.) * np.sin(_ / num_iters * np.pi)
-        
-        action = action_pos.tolist() + action_axis_angle.tolist() + [-1.]
-        # print(np.round(action, 2))
-        robot_interface.control(
-            control_type=controller_type, action=action, controller_cfg=controller_cfg
-        )
+    def osc_move(target_pose, num_iters=200):
+        target_pos, target_quat = target_pose
+        for _ in range(num_iters):
+            current_pose = np.array(robot_interface._state_buffer[-1].O_T_EE).reshape(4, 4).transpose()
+            current_pos = current_pose[:3, 3:]
+            current_rot = current_pose[:3, :3]
+            current_quat = T.mat2quat(current_rot)
+            if np.dot(target_quat, current_quat) < 0.0:
+                current_quat = -current_quat
+            quat_diff = T.quat_distance(target_quat, current_quat)
+            current_axis_angle = T.quat2axisangle(current_quat)
+            axis_angle_diff = T.quat2axisangle(quat_diff)
+            # print(np.round(current_pos.flatten(), 2))
+            action_pos = (target_pos - current_pos).flatten() * 10
+            action_axis_angle = axis_angle_diff.flatten() * 1
+            print(axis_angle_diff)
+            action_pos = np.clip(action_pos, -0.8, 0.8)
+            action_axis_angle = np.clip(action_axis_angle, -0.2, 0.2) # * np.sin(_ / num_iters * np.pi)
 
+            action = action_pos.tolist() + action_axis_angle.tolist() + [-1.]
+            # print(np.round(action, 2))
+            robot_interface.control(
+                control_type=controller_type, action=action, controller_cfg=controller_cfg
+            )
+        print("===================")
+        print(current_pos.flatten())
+        print(target_pos.flatten())
+
+    osc_move((target_pos, target_quat), num_iters=200)
     current_pose = np.array(robot_interface._state_buffer[-1].O_T_EE).reshape(4, 4).transpose()
     current_pos = current_pose[:3, 3:]
     current_rot = current_pose[:3, :3]
@@ -104,46 +95,36 @@ def move_to(robot_interface, controller_cfg, num_steps, num_additional_steps, gr
         current_quat = -current_quat
     target_axis_angle = T.quat2axisangle(target_quat)
     current_axis_angle = T.quat2axisangle(current_quat)    
+    osc_move((target_pos, target_quat), num_iters=50)
 
-    for i in range(3):
-        tmp_angle = target_axis_angle + i 
-    
-    controller_type = "OSC_POSE"
-
-    num_iters = 50
-    for _ in range(num_iters):
-        current_pose = np.array(robot_interface._state_buffer[-1].O_T_EE).reshape(4, 4).transpose()
-        current_pos = current_pose[:3, 3:]
-        current_rot = current_pose[:3, :3]
-        current_quat = T.mat2quat(current_rot)
-        if np.dot(target_quat, current_quat) < 0.0:
-            current_quat = -current_quat
-        quat_diff = T.quat_distance(target_quat, current_quat)
-        current_axis_angle = T.quat2axisangle(current_quat)
-        axis_angle_diff = T.quat2axisangle(quat_diff)
-        # print(np.round(current_pos.flatten(), 2))
-        action_pos = (target_pos - current_pos).flatten() * 10
-        action_axis_angle = axis_angle_diff.flatten() * 1
-        action_pos = np.clip(action_pos, -1., 1.)
-        action_axis_angle = np.clip(action_axis_angle, -0.1, 0.1)
+    # num_iters = 50
+    # for _ in range(num_iters):
+    #     current_pose = np.array(robot_interface._state_buffer[-1].O_T_EE).reshape(4, 4).transpose()
+    #     current_pos = current_pose[:3, 3:]
+    #     current_rot = current_pose[:3, :3]
+    #     current_quat = T.mat2quat(current_rot)
+    #     if np.dot(target_quat, current_quat) < 0.0:
+    #         current_quat = -current_quat
+    #     quat_diff = T.quat_distance(target_quat, current_quat)
+    #     current_axis_angle = T.quat2axisangle(current_quat)
+    #     axis_angle_diff = T.quat2axisangle(quat_diff)
+    #     # print(np.round(current_pos.flatten(), 2))
+    #     action_pos = (target_pos - current_pos).flatten() * 10
+    #     action_axis_angle = axis_angle_diff.flatten() * 1
+    #     action_pos = np.clip(action_pos, -1., 1.)
+    #     action_axis_angle = np.clip(action_axis_angle, -0.1, 0.1)
         
-        action = action_pos.tolist() + action_axis_angle.tolist() + [-1.]
-        # print(np.round(action, 2))
-        robot_interface.control(
-            control_type=controller_type, action=action, controller_cfg=controller_cfg
-        )
+    #     action = action_pos.tolist() + action_axis_angle.tolist() + [-1.]
+    #     # print(np.round(action, 2))
+    #     robot_interface.control(
+    #         control_type=controller_type, action=action, controller_cfg=controller_cfg
+    #     )
 
-    action[-1] = 1.
+    action = [0.] * 6 + [1.]
     for _ in range(30):
         robot_interface.control(
             control_type=controller_type, action=action, controller_cfg=controller_cfg
         )
-        
-    print("===================")
-    print(current_pos.flatten())
-    print(target_pos.flatten())
-    
-    print(axis_angle_diff)
 
 
 def main(args):
@@ -166,7 +147,7 @@ def main(args):
 
     offset_x = -0.35
     offset_y = 0.1
-    offset_z = -0.11
+    offset_z = -0.09
     extrinsics_pos += np.array([[offset_x], [offset_y], [offset_z]])
 
     transform_manager.add_transform("cam", "base", extrinsics_rot_in_matrix, extrinsics_pos)
@@ -217,7 +198,7 @@ def main(args):
         grasp, score = chosen_grasp, scores[0]
         grasp_pose = chosen_grasp.pose.as_matrix()
 
-        if (np.dot(chosen_grasp.pose.rotation.as_matrix(), np.array([0., 0., 1.])))[-1] > -0.5:
+        if (np.dot(chosen_grasp.pose.rotation.as_matrix(), np.array([0., 0., 1.])))[-1] > -0.3:
             grasp_idx += 1
             print("Rejecting the orientation of the chosen grasp!!!")
         else:
@@ -226,10 +207,10 @@ def main(args):
     T_grasp_pregrasp = Transform(Rotation.identity(), [0.0, 0.0, -0.05])
     T_world_pregrasp = (chosen_grasp.pose * T_grasp_pregrasp).as_matrix()
 
-    T_final_grasp = Transform(Rotation.identity(), [0.0, 0.0, 0.01])
+    T_final_grasp = Transform(Rotation.identity(), [0.0, 0.0, 0.02])
     T_world_grasp = (chosen_grasp.pose * T_final_grasp).as_matrix()
     
-    final_grasp_pos = T_world_grasp[:3, 3:] - np.array([[offset_x], [offset_y], [offset_z]]) - np.array([[0.0], [0.0], [0.02]])
+    final_grasp_pos = T_world_grasp[:3, 3:] - np.array([[offset_x], [offset_y], [offset_z]]) - np.array([[0.0], [0.0], [0.025]])
     final_grasp_rot = T_world_grasp[:3, :3]
 
     final_pregrasp_pos = T_world_pregrasp[:3, 3:] - np.array([[offset_x], [offset_y], [offset_z]]) -np.array([[0.0], [0.0], [0.0]])
@@ -300,6 +281,9 @@ def main(args):
 
     dispose_joint_positions = [0.3097005563560829, -0.3212347640660315, 0.3062792126150351, -2.0068433089005318, 0.16912305284409368, 1.652241069890613, 0.8192343449475313]
 
+    current_joint_positions = np.array(robot_interface._state_buffer[-1].q)
+
+    move_to_joint_configuration(robot_interface, current_joint_positions, gripper_close=True)
     move_to_joint_configuration(robot_interface, top_joint_positions, gripper_close=True)
     move_to_joint_configuration(robot_interface, dispose_joint_positions, gripper_close=True)
     move_to_joint_configuration(robot_interface, dispose_joint_positions, gripper_close=False)
