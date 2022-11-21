@@ -70,7 +70,8 @@ def move_to(robot_interface, controller_cfg, num_steps, num_additional_steps, gr
             # print(np.round(current_pos.flatten(), 2))
             action_pos = (target_pos - current_pos).flatten() * 10
             action_axis_angle = axis_angle_diff.flatten() * 1
-            print(axis_angle_diff)
+            print("Position error: ", np.round((target_pos - current_pos).flatten(), 3))
+            print("Rotation error: ", np.round(axis_angle_diff, 3))
             action_pos = np.clip(action_pos, -0.8, 0.8)
             action_axis_angle = np.clip(action_axis_angle, -0.2, 0.2) # * np.sin(_ / num_iters * np.pi)
 
@@ -83,7 +84,7 @@ def move_to(robot_interface, controller_cfg, num_steps, num_additional_steps, gr
         print(current_pos.flatten())
         print(target_pos.flatten())
 
-    osc_move((target_pos, target_quat), num_iters=200)
+    osc_move((target_pos, target_quat), num_iters=100)
     current_pose = np.array(robot_interface._state_buffer[-1].O_T_EE).reshape(4, 4).transpose()
     current_pos = current_pose[:3, 3:]
     current_rot = current_pose[:3, :3]
@@ -95,7 +96,7 @@ def move_to(robot_interface, controller_cfg, num_steps, num_additional_steps, gr
         current_quat = -current_quat
     target_axis_angle = T.quat2axisangle(target_quat)
     current_axis_angle = T.quat2axisangle(current_quat)    
-    osc_move((target_pos, target_quat), num_iters=50)
+    osc_move((target_pos, target_quat), num_iters=40)
 
     # num_iters = 50
     # for _ in range(num_iters):
@@ -146,8 +147,9 @@ def main(args):
     transform_manager = TransformManager()
 
     offset_x = -0.35
-    offset_y = 0.1
+    offset_y = 0.13
     offset_z = -0.09
+
     extrinsics_pos += np.array([[offset_x], [offset_y], [offset_z]])
 
     transform_manager.add_transform("cam", "base", extrinsics_rot_in_matrix, extrinsics_pos)
@@ -191,6 +193,9 @@ def main(args):
     scores = result['scores']
 
     grasp_idx = 0
+    if len(grasps) == 0:
+        print('No grasp detected!')
+        exit(0)
 
     while True:
         chosen_grasp = grasps[grasp_idx]
@@ -198,7 +203,7 @@ def main(args):
         grasp, score = chosen_grasp, scores[0]
         grasp_pose = chosen_grasp.pose.as_matrix()
 
-        if (np.dot(chosen_grasp.pose.rotation.as_matrix(), np.array([0., 0., 1.])))[-1] > -0.3:
+        if (np.dot(chosen_grasp.pose.rotation.as_matrix(), np.array([0., 0., 1.])))[-1] > -0.05:
             grasp_idx += 1
             print("Rejecting the orientation of the chosen grasp!!!")
         else:
@@ -207,13 +212,13 @@ def main(args):
     T_grasp_pregrasp = Transform(Rotation.identity(), [0.0, 0.0, -0.05])
     T_world_pregrasp = (chosen_grasp.pose * T_grasp_pregrasp).as_matrix()
 
-    T_final_grasp = Transform(Rotation.identity(), [0.0, 0.0, 0.02])
+    T_final_grasp = Transform(Rotation.identity(), [0.0, 0.0, 0.015])
     T_world_grasp = (chosen_grasp.pose * T_final_grasp).as_matrix()
     
-    final_grasp_pos = T_world_grasp[:3, 3:] - np.array([[offset_x], [offset_y], [offset_z]]) - np.array([[0.0], [0.0], [0.025]])
+    final_grasp_pos = T_world_grasp[:3, 3:] - np.array([[offset_x], [offset_y], [offset_z]]) - np.array([[-0.03], [0.00], [0.0]])
     final_grasp_rot = T_world_grasp[:3, :3]
 
-    final_pregrasp_pos = T_world_pregrasp[:3, 3:] - np.array([[offset_x], [offset_y], [offset_z]]) -np.array([[0.0], [0.0], [0.0]])
+    final_pregrasp_pos = T_world_pregrasp[:3, 3:] - np.array([[offset_x], [offset_y], [offset_z]]) -np.array([[-0.015], [0.00], [0.0]])
     final_pregrasp_rot = T_world_grasp[:3, :3]
 
     print(final_pregrasp_pos)
@@ -249,9 +254,12 @@ def main(args):
     
     def move_to_joint_configuration(robot_interface, joint_configuration, gripper_close=False):
         # time.sleep(0.5)
-        action =joint_configuration + [int(gripper_close) * 2 - 1]
-        start_time = time.time()
+        print(f"Moving to : {joint_configuration}")
+        action = joint_configuration + [int(gripper_close) * 2 - 1]
+        print(f"Moving to : {action}")
+        start_time = time.time()        
         while True:
+            end_time = time.time()            
             if len(robot_interface._state_buffer) > 0:
                 if (
                         np.max(
@@ -261,13 +269,12 @@ def main(args):
                             )
                         )
                         < 1e-3
-                ):
+                ) and (end_time - start_time) > 1.0:
                     break
             robot_interface.control(
                 control_type="JOINT_POSITION", action=action, controller_cfg=joint_controller_cfg
             )
-            end_time = time.time()
-            if end_time - start_time > 7.:
+            if end_time - start_time > 6.:
                 break
     
     top_joint_positions = [
@@ -279,15 +286,18 @@ def main(args):
         1.642539553759179,
         0.8188037302796993 ]
 
-    dispose_joint_positions = [0.3097005563560829, -0.3212347640660315, 0.3062792126150351, -2.0068433089005318, 0.16912305284409368, 1.652241069890613, 0.8192343449475313]
+    dispose_joint_positions = [0.486008438756645, -0.875851214873099, 0.21941024770488846, -2.3876419100510446, 0.09379814031389025, 1.5721408413482367, 1.231319760866463]
 
-    current_joint_positions = np.array(robot_interface._state_buffer[-1].q)
+    current_joint_positions = np.array(robot_interface._state_buffer[-1].q).tolist()
 
-    move_to_joint_configuration(robot_interface, current_joint_positions, gripper_close=True)
+    for _ in range(3):
+        move_to_joint_configuration(robot_interface, current_joint_positions, gripper_close=True)
+        time.sleep(0.2)    
+
     move_to_joint_configuration(robot_interface, top_joint_positions, gripper_close=True)
     move_to_joint_configuration(robot_interface, dispose_joint_positions, gripper_close=True)
     move_to_joint_configuration(robot_interface, dispose_joint_positions, gripper_close=False)
-    time.sleep(0.2)
+    time.sleep(0.5)
     move_to_joint_configuration(robot_interface, top_joint_positions, gripper_close=False)
 
 
