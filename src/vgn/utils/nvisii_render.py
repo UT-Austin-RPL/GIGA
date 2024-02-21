@@ -1,4 +1,8 @@
+import os
+import glob
+import random
 import nvisii
+from scipy.spatial.transform import Rotation as R
 
 
 class NViSIIRenderer:
@@ -46,6 +50,38 @@ class NViSIIRenderer:
 
         self.objects = {}
 
+
+    def place_objects_from_list(self, mesh_pose_list, object_root=None):
+        # new_objects = []
+        # removed_objects = []
+        if object_root is not None:
+            object_files = glob.glob(object_root + '/*')
+
+        for idx, (path, scale, pose_matrix) in enumerate(mesh_pose_list):
+            if object_root is not None:
+                path = object_files[random.randint(0, len(object_files) - 1)]
+                mesh = nvisii.mesh.create_from_file('mesh_' + str(idx), path + '/meshes/model.obj')
+                obj_entity = nvisii.entity.create(
+                    name="entity" + str(idx),
+                    mesh = mesh,
+                    transform = nvisii.transform.create("transform" + str(idx)),
+                    material = nvisii.material.create("material" + str(idx))
+                )
+                obj_entity.get_transform().set_position(pose_matrix[:3,3])
+                obj_entity.get_transform().set_rotation(R.from_matrix(pose_matrix[0:3, 0:3]).as_quat())
+                obj_entity.get_transform().set_scale((scale, scale, scale))
+
+                obj_texture = nvisii.texture.create_from_file(
+                        name=str(idx), path=path + '/materials/textures/texture.png', linear=True)
+
+                obj_entity.get_material().set_base_color_texture(obj_texture)
+            else:
+                obj = nvisii.import_scene(path)
+                obj.transforms[0].set_position(pose_matrix[:3,3])
+                obj.transforms[0].set_rotation(R.from_matrix(pose_matrix[0:3, 0:3]).as_quat())
+                obj.transforms[0].set_scale((scale, scale, scale))
+
+
     def update_objects(self, mesh_pose_dict):
         new_objects = []
         removed_objects = []
@@ -72,11 +108,17 @@ class NViSIIRenderer:
 
         return new_objects, removed_objects
 
-    def render(self, path):
-        nvisii.render_to_file(width=self.width,
-                              height=self.height,
-                              samples_per_pixel=self.spp,
-                              file_path=path)
+    def render(self, path=None):
+        if path is None:
+            img = nvisii.render(width=self.width,
+                        height=self.height,
+                        samples_per_pixel=self.spp)
+            return img
+        else:
+            nvisii.render_to_file(width=self.width,
+                                height=self.height,
+                                samples_per_pixel=self.spp,
+                                file_path=path)
 
     def set_camera(self, position, look_at, up=(0, 0, 1)):
         self.camera.get_transform().set_position(position)
@@ -102,7 +144,7 @@ class NViSIIRenderer:
 
     @staticmethod
     def init():
-        nvisii.initialize(headless=True, verbose=False)
+        nvisii.initialize(headless=True, lazy_updates=True, verbose=False)
         nvisii.enable_denoiser()
 
     @staticmethod

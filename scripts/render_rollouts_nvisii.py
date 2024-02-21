@@ -4,11 +4,16 @@ import pickle
 from tqdm import tqdm
 import argparse
 import nvisii
+import numpy as np
 from vgn.utils.nvisii_render import NViSIIRenderer
 
 def load_pkl(path):
     with open(path, 'rb') as f:
         content = pickle.load(f)
+    return content
+
+def load_npz(path):
+    content = np.load(test_mesh, allow_pickle=True)['pc']
     return content
 
 opt = {
@@ -27,7 +32,7 @@ opt = {
     },
     'floor': {
         'texture':
-        '/mnt/data0/zhenyu/robosuite-dev/robosuite/models/assets/textures/light-wood.png',
+        '/home/svcapp/simonlee0810/Codes/robosuite/robosuite/models/assets/textures/light-wood.png',
         'scale': [2, 2, 2],
         'position': [0.15, 0.15, 0.05],
     },
@@ -35,18 +40,24 @@ opt = {
 
 def main(args):
     root = args.root
-    rollout_path_list = glob.glob(os.path.join(root, '*.pkl'))
+    # rollout_path_list = glob.glob(os.path.join(root, '*.pkl'))
+    rollout_path_list = glob.glob(os.path.join(root, '*.npz'))
     rollout_path_list.sort()
     print(f'Number of frames: {len(rollout_path_list)}')
     assert len(rollout_path_list) > 0
     os.makedirs(args.save, exist_ok=True)
 
+    print('0')
     NViSIIRenderer.init()
+    print('1')
     renderer = NViSIIRenderer(opt)
+    print('2')
     renderer.reset()
+    print('3')
 
     for idx, rollout_path in tqdm(enumerate(rollout_path_list), total=len(rollout_path_list), dynamic_ncols=True):
-        mesh_pose_dict = load_pkl(rollout_path)
+        # mesh_pose_dict = load_pkl(rollout_path)
+        mesh_pose_dict = load_npz(rollout_path)
         renderer.update_objects(mesh_pose_dict)
         renderer.render(os.path.join(args.save, f'{idx:05d}.png'))
     NViSIIRenderer.deinit()
