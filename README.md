@@ -105,8 +105,10 @@ As mentioned in the [issue](https://github.com/UT-Austin-RPL/GIGA/issues/3), dat
 
 | Scenario | Raw data | Processed data |
 | ----------- | ----------- | ----------- |
-| Pile | [link](https://utexas.box.com/s/w1abs6xfe8d2fo0h9k4bxsdgtnvuwprj) | [link](https://utexas.box.com/s/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2) |
-| Packed | [link](https://utexas.box.com/s/roaozwxiikr27rgeauxs3gsgpwry7gk7) | [link](https://utexas.box.com/s/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn) |
+| Pile | [link](https://utexas.box.com/s/w1abs6xfe8d2fo0h9k4bxsdgtnvuwprj) [wget link](https://utexas.box.com/shared/static/w1abs6xfe8d2fo0h9k4bxsdgtnvuwprj.zip) | [link](https://utexas.box.com/s/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2) [wget link](https://utexas.box.com/shared/static/l3zpzlc1p6mtnu7ashiedasl2m3xrtg2.zip) |
+| Packed | [link](https://utexas.box.com/s/roaozwxiikr27rgeauxs3gsgpwry7gk7) [wget link](https://utexas.box.com/shared/static/roaozwxiikr27rgeauxs3gsgpwry7gk7.zip) | [link](https://utexas.box.com/s/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn) [wget link](https://utexas.box.com/shared/static/h48jfsqq85gt9u5lvb82s5ft6k2hqdcn.zip) |
+
+You can try `wget --no-check-certificate $wget_link` for direct download.
 
 ## Related Repositories
 
